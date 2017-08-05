@@ -1,9 +1,11 @@
 export class Cell {
-    constructor(x, y) {
+    constructor(x, y, maze) {
         this.position = {
             x: x,
             y: y
         }
+        this.maze = maze;
+
         this.walls = {
             top: true,
             bottom: true,
@@ -13,58 +15,68 @@ export class Cell {
         
         this.isVertex = false;
 
+        this.drawing = {
+            fillColor: "white",
+            dirty: false,
+            rect: this.GetDrawRect(),
+            routine: (event) => {
+
+            }
+        }
+
+        this.background = new Path.Rectangle({
+            point: [this.drawing.rect.x, this.drawing.rect.y],
+            size: [this.drawing.rect.w, this.drawing.rect.h],
+            strokeWidth: 0
+        });
+
+        this.wallPath = new Path({
+            strokeColor: "black",
+            strokeWidth: 1,
+            strokeJoin: 'round'
+        });
+        this.wallPath.moveTo(this.drawing.rect.x, this.drawing.rect.y);
+        this.wallPath.lineTo(this.drawing.rect.x + this.drawing.rect.w, this.drawing.rect.y); // make top
+        this.wallPath.lineTo(this.drawing.rect.x + this.drawing.rect.w, this.drawing.rect.y + this.drawing.rect.h); // make right
+        this.wallPath.lineTo(this.drawing.rect.x, this.drawing.rect.y + this.drawing.rect.h); // make bottom
+        this.wallPath.lineTo(this.drawing.rect.x, this.drawing.rect.y); // make left
+
+        this.maze.mazePath.addChild(this.wallPath);
+
+        this.group = new Group([this.background]);
+
     }
 
-    Draw(options) {
+    Draw(event) {
 
-        this.dirty = false;
+        this.drawing.dirty = false;
+        
+        this.background.fillColor = this.drawing.fillColor;
 
-        let cellWidth = options.width;
-        let cellHeight = options.height;
-        let baseX = cellWidth * this.position.x;
-        let baseY = cellHeight * this.position.y;
-
+        // Minor speedup. Don't draw the background if it's white (fall back to global background white)
+        this.background.visible = this.drawing.fillColor != "white";
 
         if(!this.activeStyle) {
-            p.noStroke();
-            //p.fill(0);
-            //p.rect(baseX, baseY, cellWidth + 1, cellHeight + 1);
-            //return;
+            this.background.fillColor = "white";
         }
 
-        let inset = 1;
+        /// Regenerate the walls
 
-        if(options.fill) {
-            p.noStroke();
-            p.fill(options.fill[0], options.fill[1], options.fill[2], options.fill[3] || 255);
-            p.rect(baseX + inset, baseY + inset, cellWidth + 1 - (inset * 2), cellHeight + 1 - (inset * 2));
+        // Remove all segments in wallPath
+        this.wallPath.removeSegments();
+
+        if(this.walls.right){
+            this.wallPath.add(new Point(this.drawing.rect.x + this.drawing.rect.w, this.drawing.rect.y)); // make top
+            this.wallPath.add(new Point(this.drawing.rect.x + this.drawing.rect.w, this.drawing.rect.y + this.drawing.rect.h));
         }
-
-        // if(this.isVertex){
-        //     p.noStroke();
-        //     p.fill(0, 0, 255, 40);
-        //     let radiusScale = 0.5;
-        //     p.ellipse(baseX + (cellWidth / 2), baseY + (cellHeight / 2), cellWidth * radiusScale, cellHeight * radiusScale);
-        // }
-
-
-        // Draw walls
-        p.stroke(0, 0, 0, 255);
-        p.strokeCap(p.SQUARE);
-        p.strokeWeight(1);
-
         if(this.walls.bottom) {
-            let x1 = baseX;
-            let y = baseY + cellHeight;
-            let x2 = baseX + cellWidth;
-            p.line(x1, y, x2, y);
+            if(!this.walls.right)
+                this.wallPath.add(new Point(this.drawing.rect.x + this.drawing.rect.w, this.drawing.rect.y + this.drawing.rect.h));
+            this.wallPath.add(new Point(this.drawing.rect.x, this.drawing.rect.y + this.drawing.rect.h));
         }
-        if (this.walls.right) {
-            let x = baseX + cellWidth;
-            let y1 = baseY;
-            let y2 = baseY + cellHeight;
-            p.line(x, y1, x, y2);
-        }
+
+        // Call the custom drawing routine if specified
+        this.drawing.routine.call(this, event);
         
     }
 
@@ -82,6 +94,29 @@ export class Cell {
     // so that indexing by it is possible. (No two cells should give the same name).
     toString() {
         return `Cell (${this.position.x}, ${this.position.y})`;
+    }
+
+    GetDrawRect() {
+        let cellWidth = view.size.width / this.maze.width;
+        let cellHeight = view.size.height / this.maze.height;
+        let baseX = cellWidth * this.position.x;
+        let baseY = cellHeight * this.position.y;
+
+        return {
+            x: baseX,
+            y: baseY,
+            w: cellWidth,
+            h: cellHeight
+        }
+    }
+
+    SetDrawOption(optionName, val) {
+        this.drawing[optionName] = val;
+        this.drawing.dirty = true;
+    }
+
+    GetMidPoint() {
+        return new Point(this.drawing.rect.x + (this.drawing.rect.w / 2.0), this.drawing.rect.y + (this.drawing.rect.h / 2.0));
     }
 
 

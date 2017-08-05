@@ -9,91 +9,62 @@ export class Maze {
         this.height = height;
         this.cells = [[]];
 
+        this.group = new Group();
+
         this.drawVertexConnections = false;
 
         this.solving = false;
+
+        // Compound path that holds each cell's path object. Fairly large speedup.
+        this.mazePath = new CompoundPath({
+            strokeColor: "black",
+            strokeWidth: 1,
+            strokeCap: "round"
+        });
 
         this.generator = new MazeGenerator();
         this.solver = new MazeSolver();
 
         this.wait = true;
-        this.waitMS = 0;
-        this.repsPerLoop = 60;
+        this.waitMS = 60;
+        this.repsPerLoop = 1;
 
         this.Generate();
         //this.Solve();
 
+        this.redrawAll = true;
+
+
     }
 
-    Draw() {
+    Draw(event) {
+        if(this.redrawAll) {
+            console.log("Redrawing all");
+        }
 
-        // Draw each cell
-        let cellWidth = p.width / this.width;
-        let cellHeight = p.height / this.height;
-
+        // Draw each cell if dirty or forced
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++) {
                 let cell = this.cells[y][x];
 
-                let options = {
-                    width: cellWidth,
-                    height: cellHeight,
-                }
-
-                // Add optional properties
-                if(cell == this.startCell) options.fill = [0, 255, 0];
-                if(cell == this.goalCell) options.fill = [255, 0, 0];
-
-                //if(cell.dirty || this.generator.generating)
-                    cell.Draw(options);
-            }
-        }
-
-        // Draw connected vertices
-        if(this.solver.graph && this.drawVertexConnections) {
-            p.stroke(0, 0, 255, 20);
-            p.strokeWeight(1);
-
-            for(let node of this.solver.graph.GetNodes()) {
-                for(let neighbor of node.GetNeighbors()) {
-                    let offset = -0.5;
-                    let x1 = (node.val.position.x * cellWidth) + (cellWidth * 0.5) + offset;
-                    let y1 = (node.val.position.y * cellHeight) + (cellHeight * 0.5) + offset;
-                    let x2 = (neighbor.val.position.x * cellWidth) + (cellWidth * 0.5) + offset;
-                    let y2 = (neighbor.val.position.y * cellHeight) + (cellHeight * 0.5) + offset;
-                    p.line(x1, y1, x2, y2);
+                if(cell.drawing.dirty || this.redrawAll) {
+                    if(cell == this.startCell) cell.SetDrawOption("fillColor", new Color(0, 1.0, 0));
+                    if(cell == this.goalCell) cell.SetDrawOption("fillColor", new Color(1.0, 0, 0));
+                    cell.Draw(event);
                 }
             }
         }
 
-        // Draw solution
-        if(this.solver.solution) {
-            p.stroke(0, 0, 255);
-            p.strokeCap(p.ROUND);
-            p.strokeWeight(3);
-            for(let i = 0; i < this.solver.solution.length; i++) {
-                let current = this.solver.solution[i];
-                let next = this.solver.solution[i + 1];
 
-                if(next) {
-                    let offset = -0.5;
-                    let x1 = (current.val.position.x * cellWidth) + (cellWidth * 0.5) + offset;
-                    let y1 = (current.val.position.y * cellHeight) + (cellHeight * 0.5) + offset;
-                    let x2 = (next.val.position.x * cellWidth) + (cellWidth * 0.5) + offset;
-                    let y2 = (next.val.position.y * cellHeight) + (cellHeight * 0.5) + offset;
-                    p.line(x1, y1, x2, y2);
-                }
-
-            }
-            p.strokeWeight(1);
+        this.solver.group.insertAbove(this.group);
+        if(this.solver.dirty || this.redrawAll) {
+            this.solver.Draw(event);
         }
 
-        // Draw border
-        p.strokeWeight(1);
-        p.stroke(0, 0, 0, 255);
-        p.fill(0, 0, 0, 0);
-        p.rect(0, 0, p.width, p.height);
 
+
+        // Do last
+        this.redrawAll = false;
     }
 
     GetRandomCell(){
@@ -109,6 +80,7 @@ export class Maze {
 
             this.Connect(cellA, cellB);
         }
+        this.redrawAll = true;
     }
 
     GetNeighbors(cell) {
@@ -160,25 +132,32 @@ export class Maze {
             cellB.walls.top = false;
             cellA.walls.bottom = false;
         }
+
+        cellA.drawing.dirty = true;
+        cellB.drawing.dirty = true;
     }
 
     Reset() {
         this.GenerateCells();
         this.solver.Reset();
         this.generator.Reset();
-        //this.MarkAllDirty();
+        this.redrawAll = true;
     }
 
     /**
      * Creates `this.cells`, a 2D array of Cell objects.
      */
     GenerateCells() {
+        this.group.removeChildren();
+        this.mazePath.removeChildren();
+
         this.cells = [this.height];
         for(let y = 0; y < this.height; y++){
             this.cells[y] = [];
             for(let x = 0; x < this.width; x++) {
-                this.cells[y][x] = new Cell(x, y);
-                this.cells[y][x].dirty = true;
+                this.cells[y][x] = new Cell(x, y, this);
+                this.group.addChild(this.cells[y][x].group);
+                //this.cells[y][x].dirty = true;
             }
         }
     }

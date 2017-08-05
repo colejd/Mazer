@@ -1,27 +1,48 @@
-import p5 from "p5";
-import { Mazer } from "./mazer.js";
+import "babel-polyfill";
+import { Maze } from "./maze/maze.js";
 import { GUI } from "./gui.js";
 
-let container = document.getElementById("mazer-container");
+import paper from "paper";
 
-if (!container) {
-    throw "No object with ID 'mazer-container' found.";
+window.onload = () => {
+    paper.install(window);
+
+    new Main();
+
 }
 
-new p5((p) => {
-    // Make p global 
-    // TODO: This is bad. Find some other way to do this.
-    window.p = p;
+class Main {
+    constructor() {
+        // Setup directly from canvas id:
+        paper.setup("mazer-container");
 
-    let mazer = new Mazer();
+        // Make background
+        var rect = new Path.Rectangle({
+            point: [0, 0],
+            size: [view.size.width, view.size.height],
+            strokeColor: "white"
+        });
+        //rect.sendToBack();
+        rect.fillColor = "white";
 
-    p.setup = function () {
-        //p.noSmooth();
-        mazer.Setup(container.offsetWidth, container.offsetHeight);
-        GUI.Init(mazer);
+        this.maze = new Maze(32, 32);
+        GUI.Init(this.maze);
+
+        this.frameAccum = 0;
+
+        view.onFrame = (event) => {
+            this.Draw(event);
+        }
     }
 
-    p.draw = function () {
-        mazer.Draw();
+    Draw(event) {
+
+        if(this.frameAccum == 2) {
+            this.maze.Draw(event);
+            this.frameAccum = 0;
+        }
+
+        this.frameAccum += 1;
     }
-});
+
+}

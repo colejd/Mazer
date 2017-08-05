@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: Monospace;
-            background-color: #0b0b0b;
+            background-color: #1f1f1f;
             color: #fff;
             margin: 0px;
             overflow: hidden;
@@ -30,7 +30,7 @@
 
     <!-- Plugin styles  -->
     <style>
-        div#mazer-container {
+        canvas#mazer-container {
             width: 512px;
             height: 512px;
             display: block;
@@ -39,10 +39,10 @@
             margin-top: 3em;
         }
 
-        div#mazer-container > canvas {
+        /* div#mazer-container > canvas {
             width: 100% !important;
             height: 100% !important;
-        }
+        } */
     </style>
 
     <!-- Optional Modules -->
@@ -57,7 +57,7 @@
 	    <a href="https://p5js.org/" target="_blank">p5.js</a> - mazer
     </div>
 
-    <div id="mazer-container"></div>
+    <canvas id="mazer-container"></canvas>
     <script src="../dist/js/mazer.js"></script>
 
 </body>

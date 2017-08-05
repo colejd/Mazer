@@ -42,9 +42,10 @@ export class Graph {
                 break;
             }
             else if(!visited.has(node)){
-                for(let adjacent of node.GetNeighbors()) {
-                    let new_path = path.slice();
-                    new_path.push(adjacent);
+                let neighbors = node.GetNeighbors();
+                for(let i = 0; i < neighbors.length; i++) {
+                    let new_path = path.slice(); // Clone
+                    new_path.push(neighbors[i]);
                     queue.push(new_path);
                 }
 
@@ -77,9 +78,10 @@ export class Graph {
                 break;
             }
             else if(!visited.has(node)){
-                for(let adjacent of node.GetNeighbors()) {
-                    let new_path = path.slice();
-                    new_path.push(adjacent);
+                let neighbors = node.GetNeighbors();
+                for(let i = 0; i < neighbors.length; i++) {
+                    let new_path = path.slice(); // Clone
+                    new_path.push(neighbors[i]);
                     queue.push(new_path);
                 }
 
@@ -129,7 +131,8 @@ export class Graph {
                 break;
             }
             else if(!visited.has(node)){
-                for(let adjacent of node.GetNeighbors()) {
+                let neighbors = node.GetNeighbors();
+                for(let i = 0; i < neighbors.length; i++) {
                     // If a neighbor is the goal, stop now.
                     // if(adjacent == goal) {
                     //     path.push(adjacent);
@@ -138,8 +141,8 @@ export class Graph {
                     // }
 
                     // Otherwise add the new path to the queue
-                    let new_path = path.slice();
-                    new_path.push(adjacent);
+                    let new_path = path.slice(); // Clone
+                    new_path.push(neighbors[i]);
                     queue.push(new_path);
                 }
 

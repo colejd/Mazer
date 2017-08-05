@@ -1,5 +1,7 @@
 import { lambda } from "../utils/lambda.js";
 import { timeout } from "../utils/async.js";
+var SimplexNoise = require('simplex-noise');
+let noise = new SimplexNoise(Math.random);
 
 export class MazeGenerator {
     constructor() {
@@ -33,7 +35,6 @@ export let Generators = {
 
         let initialCell = maze.GetRandomCell();
         initialCell.inMaze = true;
-        initialCell.dirty = true;
         for (let neighbor of maze.GetNeighbors(initialCell)) {
             frontier.push(neighbor);
             neighbor.inFrontier = true;
@@ -58,7 +59,6 @@ export let Generators = {
 
             // Mark the frontier cell as part of the maze
             frontierCell.inMaze = true;
-            frontierCell.dirty = true;
 
             // Remove the cell from the frontier
             frontier = frontier.filter(item => item !== frontierCell);
@@ -92,33 +92,43 @@ export let Generators = {
         initialCell.visited = true;
         let currentCell = initialCell;
         initialCell.activeStyle = true;
-        initialCell.dirty = true;
 
         let reps = 0;
         while (cellsExplored < maze.width * maze.height) {
             // Get unvisited neighbors of the current cell
             let neighbors = maze.GetNeighbors(currentCell).filter(item => !item.visited);
 
-            // If the cell has unexplored neighbors, pick one and connect to it
+            // If the current cell has unexplored neighbors, pick one and connect to it
             if(neighbors.length > 0) {
+                // If the current cell has more than one neighbor, put it back on the stack
+                // TODO: Not a great fix. Where cells used to be left orange, they now get processed twice
+                if(neighbors.length > 1) stack.push(currentCell);
+
+                currentCell.SetDrawOption("fillColor", "orange");
                 // Chooose a neighbor of the current cell (using bias function) that has not been visited
                 let randomNeighbor = lambda(neighbors, this.biasFunction)[0];
                 // Push the neighbor to the stack
                 stack.push(randomNeighbor);
+
                 // Connect the current cell to the neighbor
                 maze.Connect(currentCell, randomNeighbor);
                 // Mark the neighbor as visited
                 randomNeighbor.visited = true;
-                randomNeighbor.dirty = true;
                 randomNeighbor.activeStyle = true;
+                    
                 cellsExplored += 1;
                 // Make the neighbor the current cell
                 currentCell = randomNeighbor;
+
+                currentCell.SetDrawOption("fillColor", "yellow");
             }
             // Otherwise backtrack (will continue until reaching a cell with neighbors to explore)
             else if (stack.length > 0) {
                 // Pop a cell from the stack and make it the current cell
+                currentCell.SetDrawOption("fillColor", "white");
                 currentCell = stack.pop();
+                
+                currentCell.SetDrawOption("fillColor", "yellow");
             }
 
             reps += 1;
@@ -128,6 +138,19 @@ export let Generators = {
             }
 
         }
+
+        // Walk the stack backward marking everything white (just for visuals)
+        for(let i = stack.length - 1; i >= 0; i--) {
+            stack[i].SetDrawOption("fillColor", "white");
+
+            reps += 1;
+            if(reps >= maze.repsPerLoop && maze.wait){
+                await timeout(maze.waitMS);
+                reps = 0;
+            }
+        }
+
+        maze.redrawAll = true;
 
     },
 
@@ -160,7 +183,7 @@ export let BiasFunctions = {
     },
 
     Noise: function(obj) {
-        return p.noise((obj.position.x) / 100, (obj.position.y) / 100);
+        return noise.noise2D((obj.position.x + (Math.random() * 100)) / 100, (obj.position.y + (Math.random() * 100)) / 100);
     },
 
     Weird: function(obj) {
