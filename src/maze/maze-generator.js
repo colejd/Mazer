@@ -6,7 +6,7 @@ let noise = new SimplexNoise(Math.random);
 export class MazeGenerator {
     constructor() {
         this.biasFunction = BiasFunctions.Random;
-        this.generatorFunction = Generators.Backtrack;
+        this.generatorFunction = Generators.Prim;
     }
 
     Reset() {
@@ -30,50 +30,45 @@ export class MazeGenerator {
 }
 
 export let Generators = {
+
     Prim: async function(maze) {
-        let frontier = [];
-
-        let initialCell = maze.GetRandomCell();
-        initialCell.inMaze = true;
-        for (let neighbor of maze.GetNeighbors(initialCell)) {
-            frontier.push(neighbor);
-            neighbor.inFrontier = true;
-        }
-
-
-        let GetNeighborInMaze = (cell) => {
-            let neighbors = maze.GetNeighbors(cell);
-            let mazeNeighbors = neighbors.filter(item => item.inMaze === true);
-            // Pick the neighbor (if multiple) using the bias function
-            return lambda(mazeNeighbors, this.biasFunction)[0];
-        }
+        let active = [maze.startCell];
+        maze.startCell.linked = true;
 
         let reps = 0;
-        while(frontier.length > 0) {
-            // Get a random cell from the frontier
-            let frontierCell = frontier[Math.random() * frontier.length | 0];
-            let neighboringMazeCell = GetNeighborInMaze(frontierCell);
+        while(active.length > 0) {
 
-            // Connect the frontier cell to the neighboring maze cell
-            maze.Connect(frontierCell, neighboringMazeCell);
+            let current = lambda(active, this.biasFunction)[0];
+            let neighbors = maze.GetNeighbors(current).filter(item => item.linked !== true);
 
-            // Mark the frontier cell as part of the maze
-            frontierCell.inMaze = true;
+            if(neighbors.length > 0) {
+                let neighbor = lambda(neighbors, this.biasFunction)[0];
 
-            // Remove the cell from the frontier
-            frontier = frontier.filter(item => item !== frontierCell);
+                // Connect the frontier cell to the neighboring maze cell
+                maze.Connect(current, neighbor);
 
-            // Add the frontier cell's non-maze neighbors to the frontier
-            let nonMazeNeighbors = maze.GetNeighbors(frontierCell).filter(item => !item.inMaze && !item.inFrontier);
-            for (let neighbor of nonMazeNeighbors) {
-                frontier.push(neighbor);
+                active.push(neighbor);
+
+                neighbor.linked = true;
+
+                current.SetDrawOption("fillColor", "orange");
+                neighbor.SetDrawOption("fillColor", "yellow");
+            }
+            else {
+                // remove current from active
+                active = active.filter(item => item !== current);
+
+                current.SetDrawOption("fillColor", "white");
             }
 
+            // Timing stuff
             reps += 1;
             if(maze.wait && reps >= maze.repsPerLoop){
                 await timeout(maze.waitMS);
                 reps = 0;
             }
+
+
         }
 
 
@@ -84,70 +79,46 @@ export let Generators = {
      */
     Backtrack: async function(maze) {
 
-        let stack = [];
-
-        let cellsExplored = 1;
-
-        let initialCell = maze.cells[0][0];
-        initialCell.visited = true;
-        let currentCell = initialCell;
-        initialCell.activeStyle = true;
+        let stack = [maze.startCell];
+        maze.startCell.visited = true;
 
         let reps = 0;
-        while (cellsExplored < maze.width * maze.height) {
+        while (stack.length > 0) {
+            let current = stack[stack.length - 1];
+
             // Get unvisited neighbors of the current cell
-            let neighbors = maze.GetNeighbors(currentCell).filter(item => !item.visited);
+            let neighbors = maze.GetNeighbors(current).filter(item => !item.visited);
 
-            // If the current cell has unexplored neighbors, pick one and connect to it
-            if(neighbors.length > 0) {
-                // If the current cell has more than one neighbor, put it back on the stack
-                // TODO: Not a great fix. Where cells used to be left orange, they now get processed twice
-                if(neighbors.length > 1) stack.push(currentCell);
+            if (neighbors.length == 0) {
+                // Backtrack
+                current.SetDrawOption("fillColor", "white");
+                stack.pop();
+            }
 
-                currentCell.SetDrawOption("fillColor", "orange");
+            else {
                 // Chooose a neighbor of the current cell (using bias function) that has not been visited
-                let randomNeighbor = lambda(neighbors, this.biasFunction)[0];
-                // Push the neighbor to the stack
-                stack.push(randomNeighbor);
+                let neighbor = lambda(neighbors, this.biasFunction)[0];
 
                 // Connect the current cell to the neighbor
-                maze.Connect(currentCell, randomNeighbor);
+                maze.Connect(current, neighbor);
+
+                // Push the neighbor to the stack
+                stack.push(neighbor);
+
                 // Mark the neighbor as visited
-                randomNeighbor.visited = true;
-                randomNeighbor.activeStyle = true;
-                    
-                cellsExplored += 1;
-                // Make the neighbor the current cell
-                currentCell = randomNeighbor;
+                neighbor.visited = true;
 
-                currentCell.SetDrawOption("fillColor", "yellow");
-            }
-            // Otherwise backtrack (will continue until reaching a cell with neighbors to explore)
-            else if (stack.length > 0) {
-                // Pop a cell from the stack and make it the current cell
-                currentCell.SetDrawOption("fillColor", "white");
-                currentCell = stack.pop();
-                
-                currentCell.SetDrawOption("fillColor", "yellow");
+                current.SetDrawOption("fillColor", "orange");
+                neighbor.SetDrawOption("fillColor", "yellow");
             }
 
+            // Control timing for each loop
             reps += 1;
             if(reps >= maze.repsPerLoop && maze.wait){
                 await timeout(maze.waitMS);
                 reps = 0;
             }
 
-        }
-
-        // Walk the stack backward marking everything white (just for visuals)
-        for(let i = stack.length - 1; i >= 0; i--) {
-            stack[i].SetDrawOption("fillColor", "white");
-
-            reps += 1;
-            if(reps >= maze.repsPerLoop && maze.wait){
-                await timeout(maze.waitMS);
-                reps = 0;
-            }
         }
 
         maze.redrawAll = true;

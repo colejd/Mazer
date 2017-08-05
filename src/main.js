@@ -25,24 +25,20 @@ class Main {
         //rect.sendToBack();
         rect.fillColor = "white";
 
-        this.maze = new Maze(32, 32);
+        this.maze = new Maze(16, 16);
         GUI.Init(this.maze);
 
-        this.frameAccum = 0;
-
+        // Render the maze every n frames
+        let renderAfterNFrames = 2;
         view.onFrame = (event) => {
-            this.Draw(event);
+            if(event.count % renderAfterNFrames == 0) {
+                this.Draw(event);
+            }
         }
     }
 
     Draw(event) {
-
-        if(this.frameAccum == 2) {
-            this.maze.Draw(event);
-            this.frameAccum = 0;
-        }
-
-        this.frameAccum += 1;
+        this.maze.Draw(event);
     }
 
 }

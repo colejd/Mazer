@@ -6,7 +6,7 @@ export class MazeSolver {
 
         this.solutionPath = new Path({
             strokeColor: "blue",
-            strokeWidth: 2,
+            strokeWidth: 3,
             strokeCap: "round",
             strokeJoin: "round",
         });

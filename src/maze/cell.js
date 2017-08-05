@@ -56,9 +56,9 @@ export class Cell {
         // Minor speedup. Don't draw the background if it's white (fall back to global background white)
         this.background.visible = this.drawing.fillColor != "white";
 
-        if(!this.activeStyle) {
-            this.background.fillColor = "white";
-        }
+        // if(!this.activeStyle) {
+        //     this.background.fillColor = "white";
+        // }
 
         /// Regenerate the walls
 
