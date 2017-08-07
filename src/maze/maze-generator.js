@@ -6,7 +6,7 @@ let noise = new SimplexNoise(Math.random);
 export class MazeGenerator {
     constructor() {
         this.biasFunction = BiasFunctions.Random;
-        this.generatorFunction = Generators.Prim;
+        this.generatorFunction = Generators.Backtrack;
     }
 
     Reset() {

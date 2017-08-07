@@ -51,7 +51,7 @@ function bundle_js(bundler) {
 gulp.task("build", ["copy_resources", "copy_dependencies"], function(){
 
     var bundler = browserify(`./${srcDir}main.js`, { debug: true })
-                    .transform(babelify, { "presets": [ "es2015" ] });
+                    .transform(babelify, { "presets": [ "es2015" ], "plugins": [ "transform-runtime" ] });
 
     return bundle_js(bundler);
 });

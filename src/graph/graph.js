@@ -93,76 +93,121 @@ export class Graph {
         cb(ret);
     }
 
-    // TODO: This doesn't make any sense since we're working on an arbitrary graph.
+    // http://web.mit.edu/eranki/www/tutorials/search/
     async AStar(start, goal, cb) {
-        let visited = new Set();
-        let queue = [[start]];
+        let open = [start];
+        let closed = [];
 
-        let ret = [];
+        let VerifyNode = (node) => {
+            if(!node.f) node.f = 0;
+            if(!node.g) node.g = 0;
+            if(!node.h) node.h = 0;
+        }
+
+        let Manhattan = (a, b) => {
+            return Math.abs(a.val.position.x - b.val.position.x) + Math.abs(a.val.position.y - b.val.position.y);
+        }
+
+        let CollectionHasBetterNode = (collection, node) => {
+            let similar = collection.filter((item) => {
+                return item.val.position.x == node.val.position.x &&
+                        item.val.position.y == node.val.position.y;
+            });
+
+            for(let item of similar){
+                if(item.f < node.f){
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         let reps = 0;
         let repsPerUnit = 100;
+        let found = false;
+        
+        while(open.length > 0){
 
-        // Weight is +1 for each traversal + manhattan distance from path end to goal
-        let GetPathWeight = (path) => {
-            //let weight = path.length - 1; // Cost is 1 for each traversal
+            // Debug visualization
+            // for(let node of open) {
+            //     node.val.SetDrawOption("fillColor", "orange");
+            // }
+            // for(let node of closed) {
+            //     node.val.SetDrawOption("fillColor", "blue");
+            // }
 
-            // Calculate the weight of the path
-            let weight = 0;
-            for(let i = 1; i < path.length; i++) {
-                let dist = Math.abs(path[i].val.position.x - path[i - 1].val.position.x) + Math.abs(path[i].val.position.y - path[i - 1].val.position.y);
-                weight += dist;
-            }
+            // Sort by F cost
+            open.sort((a, b) => {
+                return a.f - b.f;
+            });
 
-            // Add manhattan distance from last node in path to the goal
-            let last = path[path.length - 1];
-            let manhattan = Math.abs(last.val.position.x - goal.val.position.x) + Math.abs(last.val.position.y - goal.val.position.y);
-            weight += manhattan;
-            
-            return weight;
-        }
+            // Get `q`: the node with the lowest f cost in `open`
+            let q = open.shift();
 
-        while (queue.length > 0) {
-            let path = queue.shift();
-            let node = path[path.length - 1];
+            VerifyNode(q);
 
-            if(node == goal) {
-                ret = path;
-                break;
-            }
-            else if(!visited.has(node)){
-                let neighbors = node.GetNeighbors();
-                for(let i = 0; i < neighbors.length; i++) {
-                    // If a neighbor is the goal, stop now.
-                    // if(adjacent == goal) {
-                    //     path.push(adjacent);
-                    //     ret = path;
-                    //     break;
-                    // }
+            // Examine each neighbor of Q
+            for(let neighbor of q.GetNeighbors()) {
+                // Ignore any neighbors on the closed list
+                if(closed.includes(neighbor)) continue;
+                
+                VerifyNode(neighbor);
+                neighbor.parent = q;
 
-                    // Otherwise add the new path to the queue
-                    let new_path = path.slice(); // Clone
-                    new_path.push(neighbors[i]);
-                    queue.push(new_path);
+                // If a neighbor is the goal, break out of while loop
+                if(neighbor == goal) {
+                    found = true;
+                    break;
                 }
 
-                visited.add(node);
+                // Distance from q.g to neighbor 
+                neighbor.g = q.g + Manhattan(q, neighbor);
+                // Distance from neighbor to goal (heuristic)
+                neighbor.h = Manhattan(neighbor, goal);
+                neighbor.f = neighbor.g + neighbor.h;
+
+                // If open has a node with a better F score, skip this neighbor
+                if(CollectionHasBetterNode(open, neighbor)) continue;
+
+                // If closed has a node with a better F score, skip this neighbor
+                if(CollectionHasBetterNode(closed, neighbor)) continue;
+
+                // Otherwise add the neighbor to the open list
+                open.push(neighbor);
+
+
             }
 
-            // Sort the queue by weight
-            queue.sort((a, b) => {
-                return GetPathWeight(a) - GetPathWeight(b);
-            });
+            if(found) {
+                break;
+            }
+
+            // Push Q on the closed list
+            closed.push(q);
 
             reps += 1;
             if(reps >= repsPerUnit){
                 await timeout(0);
                 reps = 0;
             }
+        }
+
+        let path = [];
+
+        if(found){
+            // Rebuild path
+            let current = goal;
+            path = [current];
+            while(current.parent) {
+                path.push(current.parent);
+                current = current.parent;
+            }
 
         }
 
-        cb(ret);
+        cb(path);
+
     }
 
 

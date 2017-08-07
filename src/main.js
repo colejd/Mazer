@@ -22,7 +22,7 @@ class Main {
             size: [view.size.width, view.size.height],
             strokeColor: "white"
         });
-        //rect.sendToBack();
+        rect.sendToBack();
         rect.fillColor = "white";
 
         this.maze = new Maze(16, 16);

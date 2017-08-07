@@ -21,7 +21,7 @@ export class MazeSolver {
 
         this.solution = null;
 
-        this.solverFunction = Solvers.DFS;
+        this.solverFunction = Solvers.AStar;
 
         this.solutionPath.removeSegments();
     }
@@ -32,6 +32,8 @@ export class MazeSolver {
         let graph = MazeSolver.GenerateGraph(maze);
         
         this.solving = true;
+
+        console.log("Solver started...");
         this.solverFunction.call(this, maze, graph, (path) => {
             this.solution = path;
             this.dirty = true;
@@ -39,7 +41,9 @@ export class MazeSolver {
             this.finished = true;
             this.solving = false;
             console.log("Solver finished.");
-        });
+        })
+        
+        .catch(reason => console.error(reason));
     }
 
     Draw(event) {
@@ -187,11 +191,12 @@ export let Solvers = {
         graph.DFS(graph.GetNode(maze.startCell), graph.GetNode(maze.goalCell), finishedCallback);
     },
 
+    // TODO: Doesn't work properly
     AStar: async (maze, graph, finishedCallback) => {
-        graph.AStar(graph.GetNode(maze.startCell), graph.GetNode(maze.goalCell), finishedCallback);
+        graph.AStar(graph.GetNode(maze.startCell), graph.GetNode(maze.goalCell), finishedCallback)
     },
 
-    FollowWallLeft: async (maze, graph, finishedCallback) => {
+    // FollowWallLeft: async (maze, graph, finishedCallback) => {
 
-    },
+    // },
 }
