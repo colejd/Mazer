@@ -7,6 +7,6 @@ export function lambda(collection, fn) {
     //     return item[0];
     // });
     return collection.sort((a, b) => {
-        return fn(a) - fn(b);
+        return fn(b) - fn(a);
     });
 }

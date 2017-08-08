@@ -1,12 +1,55 @@
 import { BiasFunctions, Generators } from "./maze/maze-generator.js";
 import { Solvers } from "./maze/maze-solver.js";
 
+function propertyNameOfItemInObject(obj, item) {
+    return Object.getOwnPropertyNames(obj)[Object.values(obj).indexOf(item)];
+}
+
 export class GUI {
+
+    static Init(maze, container) {
+        var control = require('control-panel');
+
+        var panel = control([
+            {type: 'button', label: 'Generate', action: () => { maze.Generate(); }},
+            {type: 'button', label: 'Solve', action: () => { maze.Solve(); }},
+            {type: 'button', label: 'Poke Holes', action: () => { maze.PokeHoles(); }},
+
+            {type: 'checkbox', label: 'Wait', initial: maze.wait},
+            {type: 'range', label: 'Loop Delay', min: 0, max: 200, initial: maze.waitMS, step: 1},
+            {type: 'range', label: 'Reps Per Loop', min: 1, max: 200, initial: maze.repsPerLoop, step:1},
+
+            {type: 'select', label: 'Generator', options: Object.getOwnPropertyNames(Generators), initial: propertyNameOfItemInObject(Generators, maze.generator.generatorFunction)},
+            {type: 'select', label: 'Bias', options: Object.getOwnPropertyNames(BiasFunctions), initial: propertyNameOfItemInObject(BiasFunctions, maze.generator.biasFunction)},
+            {type: 'select', label: 'Solver', options: Object.getOwnPropertyNames(Solvers), initial: propertyNameOfItemInObject(Solvers, maze.solver.solverFunction)},
+            
+        ], 
+        {
+            title: "Mazer", 
+            theme: 'dark', 
+            //root: container,
+            insertAboveRoot: true,
+            position: 'top-right', 
+        }
+        );
+
+        panel.box.style.opacity = "1.0";
+
+        panel.on('input', (data) => {
+            console.log(data);
+            maze.wait = data["Wait"];
+            maze.waitMS = data["Loop Delay"];
+            maze.repsPerLoop = data["Reps Per Loop"];
+            maze.generator.generatorFunction = Generators[data["Generator"]];
+            maze.generator.biasFunction = BiasFunctions[data["Bias"]];
+            maze.solver.solverFunction = Solvers[data["Solver"]];
+        });
+    }
 
     /**
      * Creates and attaches a GUI to the page if DAT.GUI is included.
      */
-    static Init(maze){
+    static InitDatGUI(maze){
         if(typeof(dat) === "undefined"){
             console.warn("No DAT.GUI instance found. Import on this page to use!");
             return;
@@ -22,10 +65,6 @@ export class GUI {
         gui.add(maze, "wait");
         gui.add(maze, "waitMS").min(0).max(1000).step(1);
         gui.add(maze, "repsPerLoop").min(1).max(200).step(1).name("repsPerWait");
-
-        function propertyNameOfItemInObject(obj, item) {
-            return Object.getOwnPropertyNames(obj)[Object.values(obj).indexOf(item)];
-        }
 
         // Generator function selector
         this.generatorFunctionName = propertyNameOfItemInObject(Generators, maze.generator.generatorFunction);

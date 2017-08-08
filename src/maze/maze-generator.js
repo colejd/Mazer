@@ -154,7 +154,7 @@ export let BiasFunctions = {
     },
 
     Noise: function(obj) {
-        return noise.noise2D((obj.position.x + (Math.random() * 100)) / 100, (obj.position.y + (Math.random() * 100)) / 100);
+        return noise.noise2D((obj.position.x) / 25, (obj.position.y) / 25);
     },
 
     Weird: function(obj) {

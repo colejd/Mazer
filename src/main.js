@@ -13,8 +13,20 @@ window.onload = () => {
 
 class Main {
     constructor() {
+        var container = document.getElementById('mazer-container');
+
+        // Make the canvas that Paper will use for rendering
+        var canvas = document.createElement("canvas");
+        container.appendChild(canvas);
+
+        canvas.style.position = "absolute";
+        canvas.style.top = 0;
+        canvas.style.left = 0;
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+
         // Setup directly from canvas id:
-        paper.setup("mazer-container");
+        paper.setup(canvas);
 
         // Make background
         var rect = new Path.Rectangle({
@@ -25,8 +37,8 @@ class Main {
         rect.sendToBack();
         rect.fillColor = "white";
 
-        this.maze = new Maze(16, 16);
-        GUI.Init(this.maze);
+        this.maze = new Maze(32, 32);
+        GUI.Init(this.maze, container);
 
         // Render the maze every n frames
         let renderAfterNFrames = 2;
