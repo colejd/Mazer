@@ -27,16 +27,17 @@ export class GUI {
         {
             title: "Mazer", 
             theme: 'dark', 
-            //root: container,
+            root: container,
             insertAboveRoot: true,
-            position: 'top-right', 
+            position: 'top-right',
+            opacity: "0.95",
+            useMenuBar: true
         }
         );
 
         panel.box.style.opacity = "1.0";
 
         panel.on('input', (data) => {
-            console.log(data);
             maze.wait = data["Wait"];
             maze.waitMS = data["Loop Delay"];
             maze.repsPerLoop = data["Reps Per Loop"];

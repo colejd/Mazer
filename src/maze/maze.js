@@ -26,7 +26,7 @@ export class Maze {
         this.solver = new MazeSolver();
 
         this.wait = true;
-        this.waitMS = 60;
+        this.waitMS = 30;
         this.repsPerLoop = 1;
 
         this.Generate();

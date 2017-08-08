@@ -20,6 +20,7 @@ export class MazeGenerator {
 
         this.generating = true;
 
+        console.log("Generator started...");
         this.generatorFunction.call(this, maze).then(() => {
             this.generating = false;
             this.finished = true;
