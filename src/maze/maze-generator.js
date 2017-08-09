@@ -1,5 +1,5 @@
 import { lambda } from "../utils/lambda.js";
-import { timeout } from "../utils/async.js";
+import { timeout, CancellationToken } from "../utils/async.js";
 var SimplexNoise = require('simplex-noise');
 let noise = new SimplexNoise(Math.random);
 
@@ -12,6 +12,13 @@ export class MazeGenerator {
     Reset() {
         this.generating = false;
         this.finished = false;
+        this.Stop();
+        this.cancellationToken = new CancellationToken();
+    }
+
+    Stop() {
+        if(this.cancellationToken)
+            this.cancellationToken.cancel();
     }
 
 
@@ -21,7 +28,7 @@ export class MazeGenerator {
         this.generating = true;
 
         console.log("Generator started...");
-        this.generatorFunction.call(this, maze).then(() => {
+        this.generatorFunction.call(this, maze, this.cancellationToken).then(() => {
             this.generating = false;
             this.finished = true;
             console.log("Generator finished.");
@@ -32,7 +39,7 @@ export class MazeGenerator {
 
 export let Generators = {
 
-    Prim: async function(maze) {
+    Prim: async function(maze, token) {
         let active = [maze.startCell];
         maze.startCell.linked = true;
 
@@ -65,7 +72,12 @@ export let Generators = {
             // Timing stuff
             reps += 1;
             if(maze.wait && reps >= maze.repsPerLoop){
-                await timeout(maze.waitMS);
+                try{
+                    await timeout(maze.waitMS, token);
+                } catch (e) {
+                    if(!e.cancelled) console.error(e);
+                    break;
+                }
                 reps = 0;
             }
 
@@ -78,7 +90,7 @@ export let Generators = {
     /**
      * Maze generation using recursive backtracking method
      */
-    Backtrack: async function(maze) {
+    Backtrack: async function(maze, token) {
 
         let stack = [maze.startCell];
         maze.startCell.visited = true;
@@ -116,7 +128,12 @@ export let Generators = {
             // Control timing for each loop
             reps += 1;
             if(reps >= maze.repsPerLoop && maze.wait){
-                await timeout(maze.waitMS);
+                try{
+                    await timeout(maze.waitMS, token);
+                } catch (e) {
+                    if(!e.cancelled) console.error(e);
+                    break;
+                }
                 reps = 0;
             }
 

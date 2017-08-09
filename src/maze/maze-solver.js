@@ -48,7 +48,7 @@ export class MazeSolver {
 
     Draw(event) {
         if(!this.dirty) return;
-        if(!this.solution) return;
+        if(!this.solution || this.solution.length == 0) return;
 
         // Add the base point
         this.solutionPath.moveTo(this.solution[0].val.GetMidPoint());

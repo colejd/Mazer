@@ -1,6 +1,7 @@
 import { MazeGenerator } from "./maze-generator.js";
 import { MazeSolver } from "./maze-solver.js";
 import { Cell } from "./cell.js";
+import { gui } from "../gui.js";
 
 
 export class Maze {
@@ -164,11 +165,7 @@ export class Maze {
 
     Generate() {
         if(this.solver.solving) {
-            console.warn("Wait for the solver to finish first!");
-            return;
-        }
-        if(this.generator.generating) {
-            console.warn("Wait for generation to finish first!");
+            gui.Toast("Wait for the solver to finish first!");
             return;
         }
         
@@ -189,11 +186,11 @@ export class Maze {
 
     Solve() {
         if(!this.generator.finished) {
-            console.warn("Wait for generation to finish first!");
+            gui.Toast("Wait for generation to finish first!");
             return;
         }
         if(this.solver.solving) {
-            console.warn("Wait for the solver to finish first!");
+            gui.Toast("Wait for the solver to finish first!");
             return;
         }
 

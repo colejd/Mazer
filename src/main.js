@@ -1,6 +1,6 @@
 import "babel-polyfill";
 import { Maze } from "./maze/maze.js";
-import { GUI } from "./gui.js";
+import { gui } from "./gui.js";
 
 import paper from "paper";
 
@@ -16,14 +16,14 @@ class Main {
         var container = document.getElementById('mazer-container');
 
         // Make the canvas that Paper will use for rendering
-        var canvas = document.createElement("canvas");
-        container.appendChild(canvas);
+        var canvas = container.appendChild(document.createElement("canvas"));
 
-        canvas.style.position = "absolute";
-        canvas.style.top = 0;
-        canvas.style.left = 0;
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
+        // canvas.style.position = "absolute";
+        // canvas.style.top = 0;
+        // canvas.style.left = 0;
+        // canvas.style.width = "100% !important";
+        // canvas.style.height = "100% !important";
+        //canvas.style.cssText += "width: 100%; height: 100%;";
 
         // Setup directly from canvas id:
         paper.setup(canvas);
@@ -38,7 +38,7 @@ class Main {
         rect.fillColor = "white";
 
         this.maze = new Maze(32, 32);
-        GUI.Init(this.maze, container);
+        gui.Init(this.maze, container);
 
         // Render the maze every n frames
         let renderAfterNFrames = 2;
