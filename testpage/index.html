@@ -30,7 +30,7 @@
 
     <!-- Plugin styles  -->
     <style>
-        div#mazer-container {
+        #mazer-container {
             max-width: 512px;
             max-height: 512px;
             width: 80vw;
@@ -42,14 +42,16 @@
             position: relative;
         }
 
-         div#mazer-container > canvas {
+        /* #mazer-container > canvas {
             width: 100% !important;
             height: 100% !important;
-        }  
+        }   */
     </style>
 
-    <!-- Optional Modules -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.4/dat.gui.min.js"></script> -->
+    <!-- Bootstrap to mess everything up  -->
+     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>  -->
 
 </head>
 
@@ -60,8 +62,9 @@
 	    <a href="http://paperjs.org/" target="_blank">paper.js</a> - mazer
     </div> -->
 
-    <div id="mazer-container"></div>
-    <script src="../dist/js/mazer.js"></script>
+
+    <div id="mazer-container"></div>  
+    <script src="../dist/js/mazer.min.js"></script> 
 
 </body>
 

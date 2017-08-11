@@ -25,6 +25,7 @@ export class Maze {
 
         this.generator = new MazeGenerator();
         this.solver = new MazeSolver();
+        this.solver.group.insertAbove(this.group);
 
         this.wait = true;
         this.waitMS = 30;
@@ -34,6 +35,18 @@ export class Maze {
         //this.Solve();
 
         this.redrawAll = true;
+
+        // Make border
+        let border = new Path({
+            strokeColor: "black",
+            strokeWidth: 1
+        })
+        border.moveTo(0, 0);
+        border.lineTo(view.size.width, 0);
+        border.lineTo(view.size.width, view.size.height);
+        border.lineTo(0, view.size.height);
+        border.lineTo(0, 0);
+        border.bringToFront();
 
 
     }
@@ -56,8 +69,6 @@ export class Maze {
             }
         }
 
-
-        this.solver.group.insertAbove(this.group);
         if(this.solver.dirty || this.redrawAll) {
             this.solver.Draw(event);
         }

@@ -38,8 +38,8 @@ function bundle_js(bundler) {
     .pipe(gulp.dest(distDir))
     .pipe(rename(package.name + '.min.js'))
     .pipe(sourcemaps.init({ loadMaps: true }))
-      // capture sourcemaps from transforms
-      //.pipe(uglify())
+    // capture sourcemaps from transforms
+    // .pipe(uglify())
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(distDir))
 }
@@ -51,7 +51,7 @@ function bundle_js(bundler) {
 gulp.task("build", ["copy_resources", "copy_dependencies"], function(){
 
     var bundler = browserify(`./${srcDir}main.js`, { debug: true })
-                    .transform(babelify, { "presets": [ "es2015" ], "plugins": [ "transform-runtime" ] });
+                    .transform(babelify, { "presets": [ "es2015" ], "plugins": [ "transform-runtime", "transform-class" ] });
 
     return bundle_js(bundler);
 });

@@ -1,35 +1,30 @@
-import "babel-polyfill";
+//import "babel-polyfill";
 import { Maze } from "./maze/maze.js";
 import { gui } from "./gui.js";
 
 import paper from "paper";
 
-window.onload = () => {
-    paper.install(window);
-
-    new Main();
-
-}
-
 class Main {
-    constructor() {
-        var container = document.getElementById('mazer-container');
+    constructor(root = document) {
+        let container = root.getElementById('mazer-container');
+
+        if(!container) throw "No mazer-container found!";
 
         // Make the canvas that Paper will use for rendering
-        var canvas = container.appendChild(document.createElement("canvas"));
+        let canvas = container.appendChild(root.createElement("canvas"));
 
         // canvas.style.position = "absolute";
         // canvas.style.top = 0;
         // canvas.style.left = 0;
-        // canvas.style.width = "100% !important";
-        // canvas.style.height = "100% !important";
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
         //canvas.style.cssText += "width: 100%; height: 100%;";
 
         // Setup directly from canvas id:
         paper.setup(canvas);
 
         // Make background
-        var rect = new Path.Rectangle({
+        let rect = new Path.Rectangle({
             point: [0, 0],
             size: [view.size.width, view.size.height],
             strokeColor: "white"
@@ -53,4 +48,16 @@ class Main {
         this.maze.Draw(event);
     }
 
+}
+
+if (document.readyState === 'complete') {
+    console.log("complete");
+    paper.install(window);
+    new Main();
+} else {
+    window.onload = () => {
+        console.log("onload");
+        paper.install(window);
+        new Main();
+    }
 }
