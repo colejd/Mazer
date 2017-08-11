@@ -1,4 +1,5 @@
 //import "babel-polyfill";
+require("babel-polyfill");
 import { Maze } from "./maze/maze.js";
 import { gui } from "./gui.js";
 
