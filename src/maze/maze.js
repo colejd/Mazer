@@ -150,9 +150,9 @@ export class Maze {
     }
 
     Reset() {
-        this.GenerateCells();
         this.solver.Reset();
         this.generator.Reset();
+        this.GenerateCells();
         this.redrawAll = true;
     }
 
@@ -175,6 +175,10 @@ export class Maze {
     }
 
     Generate() {
+        if(this.generator.generating) {
+            gui.Toast("Wait for generation to finish first!");
+            return;
+        }
         if(this.solver.solving) {
             gui.Toast("Wait for the solver to finish first!");
             return;
