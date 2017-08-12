@@ -4003,7 +4003,7 @@ var GUI = function () {
     (0, _createClass3.default)(GUI, [{
         key: "Init",
         value: function Init(maze, container) {
-            console.log("init");
+
             this.panel = new guify.GUI({
                 title: "Mazer",
                 theme: 'dark',
@@ -4885,15 +4885,16 @@ var Main = function () {
     function Main() {
         var _this = this;
 
-        var root = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document;
         (0, _classCallCheck3.default)(this, Main);
 
-        var container = root.getElementById('mazer-container');
+        var container = document.getElementById('mazer-container');
 
         if (!container) throw "No mazer-container found!";
 
         // Make the canvas that Paper will use for rendering
-        var canvas = container.appendChild(root.createElement("canvas"));
+        var canvas = container.appendChild(document.createElement("canvas"));
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
 
         // Setup directly from canvas id:
         _paper2.default.setup(canvas);
@@ -4932,12 +4933,10 @@ var Main = function () {
 }();
 
 if (document.readyState === 'complete') {
-    console.log("complete");
     _paper2.default.install(window);
     new Main();
 } else {
     window.onload = function () {
-        console.log("onload");
         _paper2.default.install(window);
         new Main();
     };

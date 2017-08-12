@@ -6,13 +6,15 @@ import { gui } from "./gui.js";
 import paper from "paper";
 
 class Main {
-    constructor(root = document) {
-        let container = root.getElementById('mazer-container');
+    constructor() {
+        let container = document.getElementById('mazer-container');
 
         if(!container) throw "No mazer-container found!";
 
         // Make the canvas that Paper will use for rendering
-        let canvas = container.appendChild(root.createElement("canvas"));
+        let canvas = container.appendChild(document.createElement("canvas"));
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
 
         // Setup directly from canvas id:
         paper.setup(canvas);
@@ -48,12 +50,10 @@ class Main {
 }
 
 if (document.readyState === 'complete') {
-    console.log("complete");
     paper.install(window);
     new Main();
 } else {
     window.onload = () => {
-        console.log("onload");
         paper.install(window);
         new Main();
     }

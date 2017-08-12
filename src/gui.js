@@ -10,7 +10,7 @@ function propertyNameOfItemInObject(obj, item) {
 class GUI {
 
     Init(maze, container) {
-        console.log("init");
+        
         this.panel = new guify.GUI({
             title: "Mazer", 
             theme: 'dark', 
