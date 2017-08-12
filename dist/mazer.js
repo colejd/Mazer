@@ -4895,15 +4895,11 @@ var Main = function () {
         // Make the canvas that Paper will use for rendering
         var canvas = container.appendChild(root.createElement("canvas"));
 
-        // canvas.style.position = "absolute";
-        // canvas.style.top = 0;
-        // canvas.style.left = 0;
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        //canvas.style.cssText += "width: 100%; height: 100%;";
-
         // Setup directly from canvas id:
         _paper2.default.setup(canvas);
+
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
 
         // Make background
         var rect = new Path.Rectangle({
