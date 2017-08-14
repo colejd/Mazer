@@ -19,17 +19,13 @@ class GUI {
             align: 'right',
             opacity: "0.95",
             useMenuBar: true
-        }, []);
+        });
 
-        this.panel.Register({
-            type: 'button', label: 'Generate', action: () => { maze.Generate(); }
-        })
-        this.panel.Register({
-            type: 'button', label: 'Solve', action: () => { maze.Solve(); }
-        })
-        this.panel.Register({
-            type: 'button', label: 'Poke Holes', action: () => { maze.PokeHoles(); }
-        })
+        this.panel.Register([
+            { type: 'button', label: 'Generate', action: () => { maze.Generate(); } },
+            { type: 'button', label: 'Solve', action: () => { maze.Solve(); } },
+            { type: 'button', label: 'Poke Holes', action: () => { maze.PokeHoles(); } },
+        ])
 
         this.panel.Register({
             type: 'checkbox', label: 'Wait',
