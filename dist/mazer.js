@@ -4921,6 +4921,10 @@ var Main = function () {
                 _this.Draw(event);
             }
         };
+
+        view.onResize = function (event) {
+            console.log("resize");
+        };
     }
 
     (0, _createClass3.default)(Main, [{

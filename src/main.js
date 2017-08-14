@@ -41,6 +41,10 @@ class Main {
                 this.Draw(event);
             }
         }
+
+        view.onResize = (event) => {
+            console.log("resize");
+        }
     }
 
     Draw(event) {

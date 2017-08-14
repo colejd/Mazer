@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.25.0",
-    "guify": "^0.2.4",
+    "guify": "^0.4.0",
     "paper": "^0.11.4",
     "simplex-noise": "^2.3.0"
   }
