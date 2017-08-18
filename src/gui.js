@@ -1,7 +1,5 @@
 import { BiasFunctions, Generators } from "./maze/maze-generator.js";
 import { Solvers } from "./maze/maze-solver.js";
-let guify = require("guify");
-//import {GUI as guify} from "guify/lib/guify.js";
 
 function propertyNameOfItemInObject(obj, item) {
     return Object.getOwnPropertyNames(obj)[Object.values(obj).indexOf(item)];
@@ -10,15 +8,18 @@ function propertyNameOfItemInObject(obj, item) {
 class GUI {
 
     Init(maze, container) {
+
+        if(!guify) {
+            console.log("Guify was not found! Include it on the page to show the GUI for this program.");
+        }
         
         this.panel = new guify.GUI({
-            title: "Mazer", 
+            title: 'Mazer', 
             theme: 'dark', 
             root: container,
-            barMode: "above",
+            barMode: 'above',
             align: 'right',
-            opacity: "0.95",
-            useMenuBar: true
+            opacity: 0.95,
         });
 
         this.panel.Register([
@@ -70,10 +71,6 @@ class GUI {
             }
         })
 
-    }
-
-    Toast(message) {
-        this.panel.Toast(message);
     }
 
 }

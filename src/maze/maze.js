@@ -176,11 +176,11 @@ export class Maze {
 
     Generate() {
         if(this.generator.generating) {
-            gui.Toast("Wait for generation to finish first!");
+            if(gui.panel) gui.panel.Toast("Wait for generation to finish first!");
             return;
         }
         if(this.solver.solving) {
-            gui.Toast("Wait for the solver to finish first!");
+            if(gui.panel) gui.panel.Toast("Wait for the solver to finish first!");
             return;
         }
         
