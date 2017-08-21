@@ -1,7 +1,7 @@
 # Mazer
 *An interactive maze creator and solver*
 
-See a demo at joncole.me/pages/mazer.
+See a demo at [joncole.me/pages/mazer](joncole.me/pages/mazer).
 
 ## About
 
