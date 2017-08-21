@@ -16,7 +16,7 @@ You can use `npm run dev:watch` to open a browser window showing the contents of
 - [Mazes for Programmers](http://www.mazesforprogrammers.com/)
     - This book is awesome. It has a lot of really clear examples of maze generation algorithms.
 - https://medium.com/@G3Kappa/generating-mazes-from-pictures-or-masking-entropy-4d050d148539
-    - This article goes into various ways of biasing maze generation algorithms so you get some really nice patterns in your pseudorandomness.
+    - This article goes into various ways of biasing maze generation algorithms to get some really nice patterns in your pseudorandomness.
 
 ## License
 MIT license. See [LICENSE.md](LICENSE.md) for details.
