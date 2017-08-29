@@ -13,7 +13,7 @@ class GUI {
             console.log("Guify was not found! Include it on the page to show the GUI for this program.");
         }
         
-        this.panel = new guify.GUI({
+        this.panel = new guify({
             title: 'Mazer', 
             theme: 'dark', 
             root: container,
